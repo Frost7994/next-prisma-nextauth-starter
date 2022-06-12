@@ -4,8 +4,9 @@ import Image from "next/image";
 
 // Utils
 import { useSession, signIn, signOut } from "next-auth/react";
+import prisma from "utils/prisma";
 
-export default function Home() {
+export default function Home({ amount }) {
     // Destructure / Invoke hooks
     const { data } = useSession();
 
@@ -28,18 +29,22 @@ export default function Home() {
                     Get started by editing <code className="bg-[#fafafa] rounded-md p-3 text-lg">pages/index.js</code>
                 </p>
 
-                <p className="text-center mx-16 mt-0 mb-4 leading-6 text-2xl">Hello, {data ? data?.user?.name : "User"}!</p>
-                <button
-                    className="border-2 rounded-md px-3 py-4 border-blue-500 text-blue-500"
-                    onClick={() => {
-                        if (data) {
-                            signOut();
-                        } else {
-                            signIn();
-                        }
-                    }}>
-                    {data ? "Sign Out" : "Sign In"}
-                </button>
+                <div className="flex gap-1 items-center">
+                    <p className="text-center leading-6 text-2xl">Hello, {data ? data?.user?.name : "User"}!</p>
+                    <button
+                        className="border-2 rounded-md px-2 py-1 border-blue-500 text-blue-500"
+                        onClick={() => {
+                            if (data) {
+                                signOut();
+                            } else {
+                                signIn();
+                            }
+                        }}>
+                        {data ? "Sign Out" : "Sign In"}
+                    </button>
+                </div>
+
+                <p>There are {amount ?? 0} questions available for users to test themselves!</p>
 
                 <div className="flex items-center justify-center flex-wrap md:max-w-[800px] w-full md:flex-row flex-col">
                     <a
@@ -85,4 +90,15 @@ export default function Home() {
             </footer>
         </div>
     );
+}
+
+export async function getServerSideProps(context) {
+    const questions = await prisma.question.findMany();
+    const amount = questions.length;
+
+    return {
+        props: {
+            amount,
+        },
+    };
 }
