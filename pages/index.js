@@ -1,7 +1,14 @@
+// Base
 import Head from "next/head";
 import Image from "next/image";
 
+// Utils
+import { useSession, signIn, signOut } from "next-auth/react";
+
 export default function Home() {
+    // Destructure / Invoke hooks
+    const { data } = useSession();
+
     return (
         <div className="p-8">
             <Head>
@@ -17,9 +24,22 @@ export default function Home() {
                     </a>
                 </h1>
 
-                <p className="text-center mx-16 my-0 leading-6 text-2xl">
+                <p className="text-center mx-16 mt-0 mb-4 leading-6 text-2xl">
                     Get started by editing <code className="bg-[#fafafa] rounded-md p-3 text-lg">pages/index.js</code>
                 </p>
+
+                <p className="text-center mx-16 mt-0 mb-4 leading-6 text-2xl">Hello, {data ? data?.user?.name : "User"}!</p>
+                <button
+                    className="border-2 rounded-md px-3 py-4 border-blue-500 text-blue-500"
+                    onClick={() => {
+                        if (data) {
+                            signOut();
+                        } else {
+                            signIn();
+                        }
+                    }}>
+                    {data ? "Sign Out" : "Sign In"}
+                </button>
 
                 <div className="flex items-center justify-center flex-wrap md:max-w-[800px] w-full md:flex-row flex-col">
                     <a
